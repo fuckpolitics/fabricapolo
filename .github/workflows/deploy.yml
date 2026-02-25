@@ -27,7 +27,13 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          for i in 1 2 3; do
+            npm ci && break
+            [ $i -eq 3 ] && exit 1
+            echo "Retry $i/3 in 15s..."
+            sleep 15
+          done
 
       - name: Build
         env:
