@@ -45,15 +45,13 @@
 <script>
 export default {
   name: 'AppFooter',
+  inject: ['openFeedbackModal'],
   methods: {
     openReviews() {
-      console.log('Открыть отзывы из футера')
-      alert('Страница отзывов будет доступна скоро!')
+      this.$router.push('/reviews')
     },
-    
     openFeedback() {
-      console.log('Открыть обратную связь из футера')
-      alert('Форма обратной связи будет доступна скоро!')
+      this.openFeedbackModal()
     }
   }
 }
@@ -65,6 +63,13 @@ export default {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
   color: rgba(255, 255, 255, 0.92);
   padding: 56px 0 26px;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    margin-top: 48px;
+    padding: 40px 0 20px;
+  }
 }
 
 .footer-grid {
@@ -131,8 +136,10 @@ export default {
 .footer-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 12px 16px;
+  min-height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);
@@ -141,6 +148,7 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .footer-btn:hover {
@@ -185,6 +193,7 @@ export default {
 @media (max-width: 900px) {
   .footer-grid {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
 
   .footer-bottom {
@@ -194,6 +203,27 @@ export default {
 
   .footer-bottom-right {
     text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-title {
+    font-size: 22px;
+  }
+
+  .footer-col-title {
+    font-size: 16px;
+  }
+
+  .footer-item,
+  .footer-link {
+    font-size: 14px;
+  }
+
+  .footer-bottom {
+    font-size: 13px;
+    margin-top: 20px;
+    padding-top: 16px;
   }
 }
 </style>

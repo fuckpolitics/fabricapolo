@@ -2,15 +2,29 @@
   <div class="category-page">
     <div class="container">
       <h1 class="page-title">{{ getCategoryTitle() }}</h1>
+
+      <!-- Jackets features — under the title -->
+      <section v-if="type === 'jackets'" class="jackets-info jackets-info--top">
+        <div class="jackets-features">
+          <div class="jf-item">
+            <span class="jf-icon">🏷️</span>
+            <span>Брендирование изделий</span>
+          </div>
+          <div class="jf-item">
+            <span class="jf-icon">🧵</span>
+            <span>Подбор материалов и фурнитуры</span>
+          </div>
+        </div>
+      </section>
       
       <div class="products-grid">
         <div 
-          v-for="product in products" 
+          v-for="(product, index) in products" 
           :key="product.id"
           class="product-card"
         >
           <div class="product-header">
-            <ProductGallery :images="product.images" />
+            <ProductGallery :images="product.images" :priority="index === 0" />
           </div>
           
           <div class="product-info">
@@ -20,6 +34,46 @@
           </div>
         </div>
       </div>
+
+      <!-- Uniform / Юнармия section -->
+      <section v-if="type === 'uniform'" class="uniform-info">
+        <p class="uniform-intro">
+          Осуществляем выпуск формы для движения Юнармия с соблюдением требований к качеству,
+          внешнему виду и единым стандартам.
+        </p>
+
+        <div class="uniform-columns">
+          <div class="uniform-col">
+            <h3>Ассортимент продукции</h3>
+            <ul class="uniform-list">
+              <li>Трикотажные футболки</li>
+              <li>Футболки-поло всех моделей</li>
+              <li>Свитшоты</li>
+              <li>Флисовая толстовка</li>
+              <li>Погоны и шевроны</li>
+            </ul>
+          </div>
+
+          <div class="uniform-col">
+            <h3>Преимущества нашего производства</h3>
+            <ul class="uniform-list">
+              <li>Лицензионный договор с Юнармией</li>
+              <li>Честный знак</li>
+              <li>Опыт работы с официальной продукцией</li>
+              <li>Вышивка и печать</li>
+              <li>Работа с собственным и давальческим сырьём</li>
+              <li>ОТК контроль</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="uniform-cta">
+          <h3>Производство продукции Юнармия под ключ</h3>
+          <p>Мы берём на себя все этапы производства и обеспечиваем стабильный результат.</p>
+        </div>
+      </section>
+
+
     </div>
   </div>
 </template>
@@ -27,6 +81,7 @@
 <script>
 import ProductGallery from './ProductGallery.vue'
 import { fileSystemManager } from '../utils/fileSystemManager.js'
+import productsData from '../data/products.json'
 
 export default {
   name: 'CategoryPage',
@@ -55,160 +110,26 @@ export default {
   methods: {
     getCategoryTitle() {
       const titles = {
-        polo: 'Футболки поло',
+        polo: 'Производство футболок поло любой сложности',
         uniform: 'Форменная одежда',
-        hoodies: 'Трикотаж',
+        hoodies: 'Ассортимент трикотажного производства',
         shoppers: 'Промо текстиль',
-        jackets: 'Жилетки/куртки/ветровки'
+        jackets: 'Производство корпоративной одежды и униформы'
       }
       return titles[this.type] || 'Каталог'
     },
-    
-    async loadProducts(type) {
+
+    loadProducts(type) {
       try {
-        // Базовые данные о товарах
-        const productsData = this.getProductsData(type)
-        
-        // Загружаем изображения для каждого товара из файловой системы
-        for (const product of productsData) {
-          product.images = fileSystemManager.getImagesFromDirectory(type, product.slug)
-        }
-        
-        this.products = productsData
+        const categoryProducts = (productsData[type] || []).map(product => ({
+          ...product,
+          images: fileSystemManager.getImagesFromDirectory(type, product.slug, product.imageOrder)
+        }))
+        this.products = categoryProducts
       } catch (error) {
         console.error('Ошибка загрузки продуктов:', error)
         this.products = []
       }
-    },
-    
-    getProductsData(type) {
-      // Базовые данные о товарах (без изображений)
-      const allProducts = {
-        polo: [
-          {
-            id: 1,
-            slug: 'female-polo',
-            name: 'Футболка поло женская',
-            description: 'Идеально подходит для корпоративного стиля',
-            price: 2500
-          },
-          {
-            id: 2,
-            slug: 'male-polo',
-            name: 'Футболка поло мужская',
-            description: 'Дышащая ткань для активного образа жизни',
-            price: 2800
-          },
-          {
-            id: 3,
-            slug: 'polo-details',
-            name: 'Футболка поло детали',
-            description: 'Премиум качество для особых случаев',
-            price: 3200
-          },
-          {
-            id: 4,
-            slug: 'basic-tshirt',
-            name: 'Футболка',
-            description: 'Удобный вариант для повседневной носки',
-            price: 2000
-          }
-        ],
-        uniform: [
-          {
-            id: 5,
-            slug: 'unarmy',
-            name: 'Юнармия',
-            description: 'Профессиональная форма для юнармии',
-            price: 4500
-          },
-          {
-            id: 6,
-            slug: 'unarmy-hoodies',
-            name: 'Юнармия. Толстовки',
-            description: 'Уютные толстовки для юнармии',
-            price: 3800
-          },
-          {
-            id: 7,
-            slug: 'ems',
-            name: 'МЧС',
-            description: 'Профессиональная форма МЧС',
-            price: 5500
-          }
-        ],
-        hoodies: [
-          {
-            id: 8,
-            slug: 'sweatshirts',
-            name: 'Толстовки',
-            description: 'Уютное тепло для холодных дней',
-            price: 3500
-          },
-          {
-            id: 9,
-            slug: 'hoodie',
-            name: 'Худи',
-            description: 'Для тренировок и активного отдыха',
-            price: 3800
-          },
-          {
-            id: 10,
-            slug: 'sweaters',
-            name: 'Свитшоты',
-            description: 'Стильные свитшоты для повседневной носки',
-            price: 3200
-          },
-          {
-            id: 11,
-            slug: 'bomber',
-            name: 'Бомберы',
-            description: 'Современные бомберы для вашего стиля',
-            price: 4500
-          },
-          {
-            id: 12,
-            slug: 'pants',
-            name: 'Брюки',
-            description: 'Комфортные брюки для повседневной носки',
-            price: 2800
-          }
-        ],
-        shoppers: [
-          {
-            id: 13,
-            slug: 'promo-textile',
-            name: 'Промо текстиль',
-            description: 'Практичные промо-изделия с брендированием',
-            price: 800
-          }
-        ],
-        jackets: [
-          {
-            id: 14,
-            slug: 'vests',
-            name: 'Жилетки',
-            description: 'Стильные и практичные жилетки',
-            price: 4200
-          },
-          {
-            id: 15,
-            slug: 'coats',
-            name: 'Куртки',
-            description: 'Защита от ветра и легких осадков',
-            price: 6500
-          },
-          {
-            id: 16,
-            slug: 'windbreaker',
-            name: 'Ветровки',
-            description: 'Легкие ветровки для демисезонного периода',
-            price: 3200
-          }
-        ]
-      }
-      
-      return allProducts[type] || []
     }
   }
 }
@@ -229,7 +150,7 @@ export default {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  grid-template-columns: 1fr;
   gap: 40px;
   margin-bottom: 40px;
 }
@@ -279,21 +200,226 @@ export default {
   color: var(--primary-color);
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
+  .category-page {
+    padding: 28px 0;
+  }
+
   .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 30px;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-size: 32px;
+    margin-bottom: 28px;
+  }
+
+  .product-info {
+    padding: 18px;
+  }
+
+  .product-name {
+    font-size: 24px;
+  }
+
+  .product-description {
+    font-size: 15px;
+  }
+
+  .product-price {
+    font-size: 24px;
+  }
+
+  .product-card:hover {
+    transform: none;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+  .category-page {
+    padding: 20px 0;
+  }
+
+  .page-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
   .products-grid {
+    gap: 16px;
+  }
+
+  .product-info {
+    padding: 16px;
+  }
+
+  .product-name {
+    font-size: 20px;
+  }
+
+  .product-description {
+    font-size: 14px;
+  }
+
+  .product-price {
+    font-size: 22px;
+  }
+}
+
+/* === Uniform info === */
+.uniform-info {
+  margin-top: 56px;
+  border-top: 2px solid rgba(114, 47, 55, 0.12);
+  padding-top: 48px;
+}
+
+.uniform-intro {
+  font-size: 19px;
+  color: var(--text-light);
+  line-height: 1.65;
+  margin-bottom: 40px;
+  max-width: 860px;
+}
+
+.uniform-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.uniform-col {
+  background: white;
+  border-radius: 16px;
+  padding: 30px 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+.uniform-col h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 18px;
+}
+
+.uniform-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.uniform-list li {
+  font-size: 16px;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(114, 47, 55, 0.04);
+  border-radius: 10px;
+  border: 1px solid rgba(114, 47, 55, 0.07);
+}
+
+.uniform-list li::before {
+  content: '✓';
+  color: var(--primary-color);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.uniform-cta {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  border-radius: 16px;
+  padding: 36px 40px;
+  color: white;
+}
+
+.uniform-cta h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.uniform-cta p {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+/* === Jackets info === */
+.jackets-info {
+  margin-top: 48px;
+}
+
+.jackets-info--top {
+  margin-top: 0;
+  margin-bottom: 36px;
+}
+
+.jackets-features {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.jf-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: white;
+  border-radius: 12px;
+  padding: 16px 22px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(114, 47, 55, 0.08);
+}
+
+.jf-icon {
+  font-size: 22px;
+}
+
+@media (max-width: 768px) {
+  .uniform-columns {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
-  .page-title {
-    font-size: 32px;
+
+  .uniform-col {
+    padding: 20px;
+  }
+
+  .uniform-cta {
+    padding: 24px 20px;
+  }
+
+  .uniform-cta h3 {
+    font-size: 20px;
+  }
+
+  .uniform-intro {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .uniform-info {
+    margin-top: 36px;
+    padding-top: 28px;
+  }
+
+  .uniform-cta {
+    border-radius: 12px;
+  }
+
+  .jf-item {
+    font-size: 15px;
   }
 }
 </style>

@@ -1,11 +1,20 @@
 <template>
   <div class="product-gallery">
-    <div class="main-image-container">
+    <div
+      class="main-image-container"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+    >
       <img 
         :src="currentImage" 
         :alt="'Product image ' + (currentIndex + 1)"
         class="main-image"
+        :loading="priority ? 'eager' : 'lazy'"
+        :fetchpriority="priority ? 'high' : undefined"
+        decoding="async"
         @error="handleImageError"
+        draggable="false"
       />
       
       <button 
@@ -38,6 +47,8 @@
         <img 
           :src="image" 
           :alt="'Thumbnail ' + (index + 1)"
+          :loading="priority && index === 0 ? 'eager' : 'lazy'"
+          decoding="async"
           @error="handleThumbnailError"
         />
       </button>
@@ -54,6 +65,10 @@ export default {
       required: true,
       validator: (value) => value.length > 0
     },
+    priority: {
+      type: Boolean,
+      default: false
+    },
     autoplay: {
       type: Boolean,
       default: false
@@ -65,7 +80,16 @@ export default {
   },
   data() {
     return {
-      currentIndex: 0
+      currentIndex: 0,
+      touchStartX: 0,
+      touchEndX: 0,
+      // Inline placeholder (работает после деплоя без внешних запросов)
+      placeholderImage: 'data:image/svg+xml,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"><rect fill="#e8e8e8" width="400" height="500"/><text x="50%" y="50%" fill="#999" font-family="sans-serif" font-size="18" text-anchor="middle" dy=".3em">Нет изображения</text></svg>'
+      ),
+      placeholderThumb: 'data:image/svg+xml,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect fill="#e8e8e8" width="80" height="80"/><text x="50%" y="50%" fill="#999" font-family="sans-serif" font-size="10" text-anchor="middle" dy=".3em">—</text></svg>'
+      )
     }
   },
   computed: {
@@ -84,11 +108,25 @@ export default {
       this.currentIndex = index
     },
     handleImageError(event) {
-      // Заменяем битое изображение на placeholder
-      event.target.src = `https://picsum.photos/seed/placeholder-${Date.now()}/400/500`
+      event.target.src = this.placeholderImage
     },
     handleThumbnailError(event) {
-      event.target.src = `https://picsum.photos/seed/thumb-${Date.now()}/80/80`
+      event.target.src = this.placeholderThumb
+    },
+    onTouchStart(e) {
+      if (this.images.length <= 1) return
+      this.touchStartX = e.touches ? e.touches[0].clientX : e.clientX
+    },
+    onTouchMove(e) {
+      if (e.touches) this.touchEndX = e.touches[0].clientX
+    },
+    onTouchEnd(e) {
+      if (this.images.length <= 1) return
+      const endX = e.changedTouches ? e.changedTouches[0].clientX : (e.clientX ?? this.touchEndX)
+      const diff = this.touchStartX - endX
+      const minSwipe = 50
+      if (diff > minSwipe) this.nextImage()
+      else if (diff < -minSwipe) this.previousImage()
     }
   },
   mounted() {
@@ -123,6 +161,7 @@ export default {
   align-items: center;
   justify-content: center;
   background: white;
+  touch-action: pan-y;
 }
 
 .main-image {
@@ -200,43 +239,62 @@ export default {
   object-fit: cover;
 }
 
-/* Стили для мобильных устройств */
+/* Стили для мобильных устройств (touch targets min 44px) */
 @media (max-width: 768px) {
   .main-image-container {
     height: 400px;
   }
-  
+
   .nav-button {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 22px;
+    -webkit-tap-highlight-color: transparent;
   }
-  
+
   .thumbnails {
-    padding: 8px;
+    padding: 10px 8px;
     gap: 6px;
+    -webkit-overflow-scrolling: touch;
   }
-  
+
   .thumbnail {
     width: 56px;
     height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
 @media (max-width: 480px) {
   .main-image-container {
-    height: 300px;
+    height: 280px;
   }
-  
+
+  .nav-button.prev {
+    left: 6px;
+  }
+
+  .nav-button.next {
+    right: 6px;
+  }
+
   .nav-button {
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 20px;
   }
-  
+
   .thumbnail {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
   }
 }
 

@@ -2,23 +2,51 @@
 
 const images = import.meta.glob(
   '/src/img/products/**/**/**/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}',
-  {
-    eager: true,
-    as: 'url' // 🔥 ВАЖНО
-  }
+  { query: '?url', import: 'default', eager: true }
 )
 
 export class FileSystemManager {
   basePath = '/src/img/products/'
 
-  getImagesFromDirectory(category, productSlug) {
+  // Returns a map of filename → resolved URL for all images in a directory
+  getImageMapForDirectory(category, productSlug) {
     const folder = `${this.basePath}${category}/${productSlug}/`
+    const map = {}
+    for (const [path, url] of Object.entries(images)) {
+      if (path.startsWith(folder)) {
+        const filename = path.slice(folder.length)
+        map[filename] = url
+      }
+    }
+    return map
+  }
 
-    const files = Object.entries(images)
-      .filter(([path]) => path.startsWith(folder))
-      .map(([, url]) => url) // 🔥 теперь это РЕАЛЬНЫЕ URL
+  // Returns resolved URLs respecting imageOrder (array of filenames).
+  // If imageOrder is empty, returns all images in default sorted order.
+  getImagesFromDirectory(category, productSlug, imageOrder = []) {
+    const map = this.getImageMapForDirectory(category, productSlug)
 
-    return this.sortImageFiles(files)
+    if (imageOrder && imageOrder.length > 0) {
+      const ordered = []
+      for (const filename of imageOrder) {
+        if (map[filename]) ordered.push(map[filename])
+      }
+      // Append any files that exist on disk but are not in imageOrder yet
+      for (const [filename, url] of Object.entries(map)) {
+        if (!imageOrder.includes(filename)) ordered.push(url)
+      }
+      return ordered
+    }
+
+    return this.sortImageFiles(Object.values(map))
+  }
+
+  // Returns list of filenames (not URLs) available in a directory
+  getFilenamesInDirectory(category, productSlug) {
+    const folder = `${this.basePath}${category}/${productSlug}/`
+    return Object.keys(images)
+      .filter(path => path.startsWith(folder))
+      .map(path => path.slice(folder.length))
   }
 
   sortImageFiles(files) {

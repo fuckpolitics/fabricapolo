@@ -3,10 +3,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import Home from './components/Home.vue'
 import CategoryPage from './components/CategoryPage.vue'
+import ReviewsPage from './components/ReviewsPage.vue'
+import AboutPage from './components/AboutPage.vue'
+import AdminPage from './components/AdminPage.vue'
 
 const routes = [
   { path: '/', component: Home },
-  { path: '/category/:type', component: CategoryPage, props: true }
+  { path: '/about', component: AboutPage },
+  { path: '/category/:type', component: CategoryPage, props: true },
+  { path: '/reviews', component: ReviewsPage },
+  { path: '/admin', component: AdminPage }
 ]
 
 const router = createRouter({

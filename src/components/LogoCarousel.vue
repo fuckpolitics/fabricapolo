@@ -69,6 +69,8 @@ export default {
 .control {
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 999px;
   border: 1px solid rgba(114, 47, 55, 0.22);
   background: #fff;
@@ -76,6 +78,7 @@ export default {
   font-size: 22px;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .control:hover {
@@ -89,6 +92,7 @@ export default {
   overflow-x: auto;
   padding: 8px 4px 18px;
   scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 .track::-webkit-scrollbar {
@@ -130,6 +134,10 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .carousel-top {
+    margin-bottom: 12px;
+  }
+
   .title {
     font-size: 26px;
   }
@@ -137,6 +145,33 @@ export default {
   .logo-card {
     width: 180px;
     height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-top {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 20px;
+    flex: 1 1 100%;
+  }
+
+  .controls {
+    margin-left: auto;
+  }
+
+  .logo-card {
+    width: 160px;
+    height: 90px;
+    padding: 10px;
+  }
+
+  .track {
+    gap: 12px;
+    padding: 6px 4px 14px;
   }
 }
 </style>

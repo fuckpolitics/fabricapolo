@@ -6,11 +6,7 @@
       "name": "Футболка поло женская",
       "description": "Идеально подходит для корпоративного стиля",
       "price": 2500,
-      "images": [
-        "https://picsum.photos/seed/polo-female-1/400/500",
-        "https://picsum.photos/seed/polo-female-2/400/500",
-        "https://picsum.photos/seed/polo-female-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 2,
@@ -18,11 +14,7 @@
       "name": "Футболка поло мужская",
       "description": "Дышащая ткань для активного образа жизни",
       "price": 2800,
-      "images": [
-        "https://picsum.photos/seed/polo-male-1/400/500",
-        "https://picsum.photos/seed/polo-male-2/400/500",
-        "https://picsum.photos/seed/polo-male-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 3,
@@ -30,11 +22,7 @@
       "name": "Футболка поло детали",
       "description": "Премиум качество для особых случаев",
       "price": 3200,
-      "images": [
-        "https://picsum.photos/seed/polo-details-1/400/500",
-        "https://picsum.photos/seed/polo-details-2/400/500",
-        "https://picsum.photos/seed/polo-details-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 4,
@@ -42,11 +30,7 @@
       "name": "Футболка",
       "description": "Удобный вариант для повседневной носки",
       "price": 2000,
-      "images": [
-        "https://picsum.photos/seed/tshirt-basic-1/400/500",
-        "https://picsum.photos/seed/tshirt-basic-2/400/500",
-        "https://picsum.photos/seed/tshirt-basic-3/400/500"
-      ]
+      "imageOrder": []
     }
   ],
   "uniform": [
@@ -56,11 +40,7 @@
       "name": "Юнармия",
       "description": "Профессиональная форма для юнармии",
       "price": 4500,
-      "images": [
-        "https://picsum.photos/seed/unarmy-1/400/500",
-        "https://picsum.photos/seed/unarmy-2/400/500",
-        "https://picsum.photos/seed/unarmy-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 6,
@@ -68,11 +48,7 @@
       "name": "Юнармия. Толстовки",
       "description": "Уютные толстовки для юнармии",
       "price": 3800,
-      "images": [
-        "https://picsum.photos/seed/unarmy-hoodie-1/400/500",
-        "https://picsum.photos/seed/unarmy-hoodie-2/400/500",
-        "https://picsum.photos/seed/unarmy-hoodie-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 7,
@@ -80,11 +56,7 @@
       "name": "МЧС",
       "description": "Профессиональная форма МЧС",
       "price": 5500,
-      "images": [
-        "https://picsum.photos/seed/ems-1/400/500",
-        "https://picsum.photos/seed/ems-2/400/500",
-        "https://picsum.photos/seed/ems-3/400/500"
-      ]
+      "imageOrder": []
     }
   ],
   "hoodies": [
@@ -94,11 +66,7 @@
       "name": "Толстовки",
       "description": "Уютное тепло для холодных дней",
       "price": 3500,
-      "images": [
-        "https://picsum.photos/seed/sweatshirt-1/400/500",
-        "https://picsum.photos/seed/sweatshirt-2/400/500",
-        "https://picsum.photos/seed/sweatshirt-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 9,
@@ -106,11 +74,7 @@
       "name": "Худи",
       "description": "Для тренировок и активного отдыха",
       "price": 3800,
-      "images": [
-        "https://picsum.photos/seed/hoodie-1/400/500",
-        "https://picsum.photos/seed/hoodie-2/400/500",
-        "https://picsum.photos/seed/hoodie-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 10,
@@ -118,11 +82,7 @@
       "name": "Свитшоты",
       "description": "Стильные свитшоты для повседневной носки",
       "price": 3200,
-      "images": [
-        "https://picsum.photos/seed/sweatshirt-1/400/500",
-        "https://picsum.photos/seed/sweatshirt-2/400/500",
-        "https://picsum.photos/seed/sweatshirt-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 11,
@@ -130,11 +90,7 @@
       "name": "Бомберы",
       "description": "Современные бомберы для вашего стиля",
       "price": 4500,
-      "images": [
-        "https://picsum.photos/seed/bomber-1/400/500",
-        "https://picsum.photos/seed/bomber-2/400/500",
-        "https://picsum.photos/seed/bomber-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 12,
@@ -142,11 +98,7 @@
       "name": "Брюки",
       "description": "Комфортные брюки для повседневной носки",
       "price": 2800,
-      "images": [
-        "https://picsum.photos/seed/pants-1/400/500",
-        "https://picsum.photos/seed/pants-2/400/500",
-        "https://picsum.photos/seed/pants-3/400/500"
-      ]
+      "imageOrder": []
     }
   ],
   "shoppers": [
@@ -156,11 +108,7 @@
       "name": "Промо текстиль",
       "description": "Практичные промо-изделия с брендированием",
       "price": 800,
-      "images": [
-        "https://picsum.photos/seed/promo-textile-1/400/500",
-        "https://picsum.photos/seed/promo-textile-2/400/500",
-        "https://picsum.photos/seed/promo-textile-3/400/500"
-      ]
+      "imageOrder": []
     }
   ],
   "jackets": [
@@ -170,11 +118,7 @@
       "name": "Жилетки",
       "description": "Стильные и практичные жилетки",
       "price": 4200,
-      "images": [
-        "https://picsum.photos/seed/vest-1/400/500",
-        "https://picsum.photos/seed/vest-2/400/500",
-        "https://picsum.photos/seed/vest-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 15,
@@ -182,11 +126,7 @@
       "name": "Куртки",
       "description": "Защита от ветра и легких осадков",
       "price": 6500,
-      "images": [
-        "https://picsum.photos/seed/jacket-1/400/500",
-        "https://picsum.photos/seed/jacket-2/400/500",
-        "https://picsum.photos/seed/jacket-3/400/500"
-      ]
+      "imageOrder": []
     },
     {
       "id": 16,
@@ -194,11 +134,7 @@
       "name": "Ветровки",
       "description": "Легкие ветровки для демисезонного периода",
       "price": 3200,
-      "images": [
-        "https://picsum.photos/seed/windbreaker-1/400/500",
-        "https://picsum.photos/seed/windbreaker-2/400/500",
-        "https://picsum.photos/seed/windbreaker-3/400/500"
-      ]
+      "imageOrder": []
     }
   ]
 }

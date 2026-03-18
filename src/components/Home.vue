@@ -3,12 +3,12 @@
     <div class="container-wide">
       <section class="hero">
         <div class="hero-content">
-          <h2>Корпоративная одежда под ваш бренд</h2>
+          <h2>Корпоративная одежда под Ваш бренд</h2>
           <p>
             Производим поло, форму, худи, футболки и аксессуары.
-            Подберём ткань, нанесение и лекала под задачи компании.
+            Подберём ткань, сделаем нанесение и лекала под задачи компании.
           </p>
-          <button class="btn" @click="goToCategory('polo')">Смотреть поло</button>
+          <button class="btn" @click="goToAbout">О нас</button>
         </div>
       </section>
 
@@ -62,6 +62,16 @@
 import ImageSlideshow from './ImageSlideshow.vue'
 import LogoCarousel from './LogoCarousel.vue'
 
+import logoGazprom from '../img/logos/gazprom.png'
+import logoDns from '../img/logos/dns.png'
+import logoAzbuka from '../img/logos/azbuka.png'
+import logoAkson from '../img/logos/akson.png'
+import logoHors from '../img/logos/hors.png'
+import logoMchs from '../img/logos/mchs.png'
+import logoNestle from '../img/logos/nestle.png'
+import logoYota from '../img/logos/yota.png'
+import logoPanChemodan from '../img/logos/pan-chemodan.png'
+
 export default {
   name: 'Home',
   components: {
@@ -75,7 +85,7 @@ export default {
           id: 1,
           name: 'Футболки поло',
           type: 'polo',
-          description: 'Классические и стильные поло для корпоративного стиля'
+          description: 'Производим поло всех моделей — от классики до индивидуальных решений'
         },
         {
           id: 2,
@@ -87,19 +97,19 @@ export default {
           id: 3,
           name: 'Трикотаж',
           type: 'hoodies',
-          description: 'Уютная и стильная верхняя одежда для вашего бренда'
+          description: 'Свитшоты и худи / Толстовки и бомберы / Лонгсливы / Брюки'
         },
         {
           id: 4,
           name: 'Жилетки/куртки/ветровки',
           type: 'jackets',
-          description: 'Демисезонная одежда для корпоративного гардероба'
+          description: 'Жилеты / Ветровки / Куртки / Бейсболки — брендирование и подбор материалов'
         },
         {
           id: 5,
           name: 'Промо текстиль',
           type: 'shoppers',
-          description: 'Практичные сумки-шопперы с брендированием'
+          description: 'Практичные сумки, шопперы, рюкзаки с брендированием'
         }
       ],
       showcaseImages: [
@@ -108,16 +118,22 @@ export default {
         'https://picsum.photos/seed/fp-showcase-3/1200/900'
       ],
       clientLogos: [
-        { name: 'Company A', src: 'https://dummyimage.com/320x140/ffffff/722f37.png&text=Company+A' },
-        { name: 'Company B', src: 'https://dummyimage.com/320x140/ffffff/722f37.png&text=Company+B' },
-        { name: 'Company C', src: 'https://dummyimage.com/320x140/ffffff/722f37.png&text=Company+C' },
-        { name: 'Company D', src: 'https://dummyimage.com/320x140/ffffff/722f37.png&text=Company+D' },
-        { name: 'Company E', src: 'https://dummyimage.com/320x140/ffffff/722f37.png&text=Company+E' },
-        { name: 'Company F', src: 'https://dummyimage.com/320x140/ffffff/722f37.png&text=Company+F' }
+        { name: 'Газпром', src: logoGazprom },
+        { name: 'DNS Цифровой', src: logoDns },
+        { name: 'Азбука Вкуса', src: logoAzbuka },
+        { name: 'Аксон', src: logoAkson },
+        { name: 'HORS', src: logoHors },
+        { name: 'МЧС России', src: logoMchs },
+        { name: 'Nestlé', src: logoNestle },
+        { name: 'Yota', src: logoYota },
+        { name: 'Пан Чемодан', src: logoPanChemodan }
       ]
     }
   },
   methods: {
+    goToAbout() {
+      this.$router.push('/about')
+    },
     goToCategory(type) {
       this.$router.push(`/category/${type}`)
     }
@@ -370,6 +386,91 @@ export default {
 
   .split-right h3 {
     font-size: 26px;
+  }
+
+  .split-right p {
+    font-size: 16px;
+  }
+
+  .point-text {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    padding: 24px 0 60px;
+  }
+
+  .hero {
+    min-height: 280px;
+    margin: 6px 0 28px;
+    border-radius: 12px;
+  }
+
+  .hero-content {
+    padding: 24px 20px;
+  }
+
+  .hero-content h2 {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+
+  .hero-content p {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .category-banners {
+    gap: 16px;
+  }
+
+  .category-banner {
+    height: 200px;
+    border-radius: 12px;
+  }
+
+  .banner-content {
+    padding: 20px;
+  }
+
+  .banner-content h2 {
+    font-size: 22px;
+  }
+
+  .banner-content p {
+    font-size: 14px;
+  }
+
+  .split {
+    padding: 20px 16px;
+    margin: 0 0 40px;
+    border-radius: 12px;
+  }
+
+  .split-left {
+    min-height: 240px;
+  }
+
+  .split-right h3 {
+    font-size: 22px;
+  }
+
+  .split-right p {
+    font-size: 15px;
+  }
+
+  .point {
+    padding: 14px 16px;
+  }
+
+  .point-title {
+    font-size: 15px;
+  }
+
+  .logos {
+    margin: 0;
   }
 }
 </style>

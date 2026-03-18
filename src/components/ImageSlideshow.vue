@@ -74,6 +74,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 280px;
   border-radius: 18px;
   overflow: hidden;
   background: #f6f6f6;
@@ -93,6 +94,8 @@ export default {
   transform: translateY(-50%);
   width: 48px;
   height: 48px;
+  min-width: 48px;
+  min-height: 48px;
   border: none;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.55);
@@ -103,6 +106,7 @@ export default {
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav:hover {
@@ -132,9 +136,50 @@ export default {
   border: none;
   background: rgba(114, 47, 55, 0.25);
   cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .dot.active {
   background: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .frame {
+    min-height: 240px;
+    border-radius: 12px;
+  }
+
+  .nav {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 22px;
+  }
+
+  .prev {
+    left: 8px;
+  }
+
+  .next {
+    right: 8px;
+  }
+
+  .dots {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .frame {
+    min-height: 200px;
+  }
 }
 </style>
