@@ -172,6 +172,7 @@ import productsSource from '../data/products.json'
 const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'admin'
 const GH_OWNER = import.meta.env.VITE_GITHUB_OWNER || ''
 const GH_REPO = import.meta.env.VITE_GITHUB_REPO || ''
+const GH_TOKEN_PRESET = import.meta.env.VITE_GITHUB_TOKEN || ''
 
 export default {
   name: 'AdminPage',
@@ -188,6 +189,11 @@ export default {
       }
     }
 
+    // If a token is preset via env var, create the API instance immediately
+    const api = GH_TOKEN_PRESET
+      ? new GitHubApi(GH_TOKEN_PRESET, GH_OWNER, GH_REPO)
+      : null
+
     return {
       // Auth
       authenticated: false,
@@ -196,10 +202,10 @@ export default {
 
       // GitHub
       githubToken: '',
-      tokenConfirmed: false,
+      tokenConfirmed: !!GH_TOKEN_PRESET,
       tokenChecking: false,
       tokenError: '',
-      api: null,
+      api,
 
       // Products (mutable copy)
       products,
