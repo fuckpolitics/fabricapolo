@@ -188,9 +188,7 @@
       "name": "Промо текстиль",
       "description": "Практичные промо-изделия с брендированием",
       "price": 800,
-      "imageOrder": [
-        "images-2.png"
-      ]
+      "imageOrder": []
     }
   ],
   "jackets": [
@@ -201,6 +199,7 @@
       "description": "Стильные и практичные жилетки",
       "price": 4200,
       "imageOrder": [
+        "IMG_1318.jpg",
         "1.jpg",
         "DSC_2401.jpg",
         "DSC_2449.jpg",
