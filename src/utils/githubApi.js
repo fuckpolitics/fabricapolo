@@ -94,59 +94,68 @@ export class GitHubApi {
 
   // Commit multiple text files in a single Git commit via Trees API.
   // files: [{ path: 'src/...', content: '...' }, ...]
-  async commitMultipleFiles(files, message) {
-    // 1. Get current branch tip SHA
-    const refRes = await fetch(`${this.gitBase}/ref/heads/${this.branch}`, {
-      headers: this._headers()
-    })
-    if (!refRes.ok) throw new Error(`Git ref error ${refRes.status}: ${await refRes.text()}`)
-    const refData = await refRes.json()
-    const latestCommitSha = refData.object.sha
-
-    // 2. Get the tree SHA of the latest commit
-    const commitRes = await fetch(`${this.gitBase}/commits/${latestCommitSha}`, {
-      headers: this._headers()
-    })
-    if (!commitRes.ok) throw new Error(`Git commit error ${commitRes.status}: ${await commitRes.text()}`)
-    const commitData = await commitRes.json()
-    const baseTreeSha = commitData.tree.sha
-
-    // 3. Create a new tree with the updated files
-    const tree = files.map(f => ({
-      path: f.path,
-      mode: '100644',
-      type: 'blob',
-      content: f.content
-    }))
-    const treeRes = await fetch(`${this.gitBase}/trees`, {
-      method: 'POST',
-      headers: this._headers(),
-      body: JSON.stringify({ base_tree: baseTreeSha, tree })
-    })
-    if (!treeRes.ok) throw new Error(`Git tree error ${treeRes.status}: ${await treeRes.text()}`)
-    const treeData = await treeRes.json()
-
-    // 4. Create the commit
-    const newCommitRes = await fetch(`${this.gitBase}/commits`, {
-      method: 'POST',
-      headers: this._headers(),
-      body: JSON.stringify({
-        message,
-        tree: treeData.sha,
-        parents: [latestCommitSha]
+  async commitMultipleFiles(files, message, retries = 3) {
+    for (let attempt = 0; attempt < retries; attempt++) {
+      // 1. Get current branch tip SHA (fresh every attempt)
+      const refRes = await fetch(`${this.gitBase}/ref/heads/${this.branch}`, {
+        headers: this._headers()
       })
-    })
-    if (!newCommitRes.ok) throw new Error(`Git commit create error ${newCommitRes.status}: ${await newCommitRes.text()}`)
-    const newCommitData = await newCommitRes.json()
+      if (!refRes.ok) throw new Error(`Git ref error ${refRes.status}: ${await refRes.text()}`)
+      const refData = await refRes.json()
+      const latestCommitSha = refData.object.sha
 
-    // 5. Update the branch ref
-    const updateRefRes = await fetch(`${this.gitBase}/refs/heads/${this.branch}`, {
-      method: 'PATCH',
-      headers: this._headers(),
-      body: JSON.stringify({ sha: newCommitData.sha })
-    })
-    if (!updateRefRes.ok) throw new Error(`Git ref update error ${updateRefRes.status}: ${await updateRefRes.text()}`)
-    return newCommitData
+      // 2. Get the tree SHA of the latest commit
+      const commitRes = await fetch(`${this.gitBase}/commits/${latestCommitSha}`, {
+        headers: this._headers()
+      })
+      if (!commitRes.ok) throw new Error(`Git commit error ${commitRes.status}: ${await commitRes.text()}`)
+      const commitData = await commitRes.json()
+      const baseTreeSha = commitData.tree.sha
+
+      // 3. Create a new tree with the updated files
+      const tree = files.map(f => ({
+        path: f.path,
+        mode: '100644',
+        type: 'blob',
+        content: f.content
+      }))
+      const treeRes = await fetch(`${this.gitBase}/trees`, {
+        method: 'POST',
+        headers: this._headers(),
+        body: JSON.stringify({ base_tree: baseTreeSha, tree })
+      })
+      if (!treeRes.ok) throw new Error(`Git tree error ${treeRes.status}: ${await treeRes.text()}`)
+      const treeData = await treeRes.json()
+
+      // 4. Create the commit
+      const newCommitRes = await fetch(`${this.gitBase}/commits`, {
+        method: 'POST',
+        headers: this._headers(),
+        body: JSON.stringify({
+          message,
+          tree: treeData.sha,
+          parents: [latestCommitSha]
+        })
+      })
+      if (!newCommitRes.ok) throw new Error(`Git commit create error ${newCommitRes.status}: ${await newCommitRes.text()}`)
+      const newCommitData = await newCommitRes.json()
+
+      // 5. Update the branch ref — retry on 422 (non-fast-forward race condition)
+      const updateRefRes = await fetch(`${this.gitBase}/refs/heads/${this.branch}`, {
+        method: 'PATCH',
+        headers: this._headers(),
+        body: JSON.stringify({ sha: newCommitData.sha })
+      })
+
+      if (updateRefRes.status === 422 && attempt < retries - 1) {
+        // Another push happened between our read and write — retry with fresh HEAD
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+        continue
+      }
+
+      if (!updateRefRes.ok) throw new Error(`Git ref update error ${updateRefRes.status}: ${await updateRefRes.text()}`)
+      return newCommitData
+    }
   }
 
   async updateProductsAndReviews(productsObject, reviewsArray) {
