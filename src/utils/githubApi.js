@@ -3,6 +3,7 @@
 // The token is provided by the user in the admin UI and never stored persistently.
 
 const PRODUCTS_JSON_PATH = 'src/data/products.json'
+const REVIEWS_JSON_PATH = 'src/data/reviews.json'
 
 export class GitHubApi {
   constructor(token, owner, repo, branch = 'main') {
@@ -70,6 +71,13 @@ export class GitHubApi {
     // Small delay to let GitHub settle after any preceding file operations
     await new Promise(r => setTimeout(r, 500))
     return this.uploadFile(PRODUCTS_JSON_PATH, base64, 'CMS: update products.json')
+  }
+
+  async updateReviewsJson(reviewsArray) {
+    const json = JSON.stringify(reviewsArray, null, 2)
+    const base64 = btoa(unescape(encodeURIComponent(json)))
+    await new Promise(r => setTimeout(r, 500))
+    return this.uploadFile(REVIEWS_JSON_PATH, base64, 'CMS: update reviews.json')
   }
 
   // Validate the token by fetching repo info

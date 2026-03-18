@@ -1,14 +1,18 @@
 <template>
   <div id="app">
-    <AppHeader />
-    <router-view />
-    <AppFooter />
-    <FeedbackModal :open="showFeedbackModal" @close="showFeedbackModal = false" />
+    <template v-if="!isAdmin">
+      <AppHeader />
+      <router-view />
+      <AppFooter />
+      <FeedbackModal :open="showFeedbackModal" @close="showFeedbackModal = false" />
+    </template>
+    <router-view v-else />
   </div>
 </template>
 
 <script>
-import { ref, provide } from 'vue'
+import { ref, provide, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import AppHeader from './components/AppHeader.vue'
 import AppFooter from './components/AppFooter.vue'
 import FeedbackModal from './components/FeedbackModal.vue'
@@ -21,11 +25,13 @@ export default {
     FeedbackModal
   },
   setup() {
+    const route = useRoute()
     const showFeedbackModal = ref(false)
+    const isAdmin = computed(() => route.path === '/admin')
     provide('openFeedbackModal', () => {
       showFeedbackModal.value = true
     })
-    return { showFeedbackModal }
+    return { showFeedbackModal, isAdmin }
   }
 }
 </script>

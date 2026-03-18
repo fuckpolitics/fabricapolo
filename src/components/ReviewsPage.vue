@@ -30,13 +30,13 @@
 </template>
 
 <script>
-import { reviews } from '../data/reviews.js'
+import reviewsData from '../data/reviews.json'
 
 export default {
   name: 'ReviewsPage',
   data() {
     return {
-      reviews
+      reviews: reviewsData
     }
   },
   methods: {

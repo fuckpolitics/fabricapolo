@@ -24,7 +24,7 @@
     <div v-else class="cms-layout">
       <header class="cms-header">
         <h1 class="cms-logo">CMS — Фабрика Поло</h1>
-        <button class="btn-logout" @click="authenticated = false">Выйти</button>
+        <button class="btn-logout" @click="logout">Выйти</button>
       </header>
 
       <div class="cms-body">
@@ -51,21 +51,76 @@
         </section>
 
         <template v-else>
-          <!-- Category tabs -->
+        <!-- Category tabs -->
           <div class="tabs">
             <button
               v-for="cat in categories"
               :key="cat.key"
               class="tab"
-              :class="{ active: activeCategory === cat.key }"
-              @click="activeCategory = cat.key"
+              :class="{ active: activeTab === cat.key }"
+              @click="activeTab = cat.key"
             >
               {{ cat.label }}
             </button>
+            <button
+              class="tab tab--reviews"
+              :class="{ active: activeTab === 'reviews' }"
+              @click="activeTab = 'reviews'"
+            >
+              Отзывы
+            </button>
+          </div>
+
+          <!-- Reviews editor -->
+          <div v-if="isReviewsTab" class="reviews-editor">
+            <div
+              v-for="(review, idx) in reviews"
+              :key="review.id"
+              class="review-editor card"
+            >
+              <div class="review-editor-header">
+                <span class="review-num">Отзыв {{ idx + 1 }}</span>
+                <button class="btn-delete-review" @click="deleteReview(idx)">Удалить</button>
+              </div>
+              <div class="review-fields">
+                <div class="field-group">
+                  <label>Автор</label>
+                  <input v-model="review.author" type="text" class="field-input" placeholder="Иван И." />
+                </div>
+                <div class="field-group">
+                  <label>Компания</label>
+                  <input v-model="review.company" type="text" class="field-input" placeholder="ООО «...» (необязательно)" />
+                </div>
+                <div class="field-group">
+                  <label>Текст отзыва</label>
+                  <textarea v-model="review.text" class="field-input field-textarea" rows="4" />
+                </div>
+                <div class="review-meta">
+                  <div class="field-group">
+                    <label>Дата</label>
+                    <input v-model="review.date" type="date" class="field-input field-input--short" />
+                  </div>
+                  <div class="field-group">
+                    <label>Оценка</label>
+                    <div class="star-picker">
+                      <button
+                        v-for="n in 5"
+                        :key="n"
+                        class="star-btn"
+                        :class="{ filled: n <= review.rating }"
+                        @click="review.rating = n"
+                      >★</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-add-review" @click="addReview">+ Добавить отзыв</button>
           </div>
 
           <!-- Products in active category -->
-          <div class="products-list">
+          <div v-else class="products-list">
             <div
               v-for="product in currentProducts"
               :key="product.id"
@@ -138,6 +193,7 @@
               </div>
             </div>
           </div>
+          <!-- /v-else products list -->
 
           <!-- Save button -->
           <div class="save-bar">
@@ -168,20 +224,19 @@
 import { GitHubApi, fileToBase64 } from '../utils/githubApi.js'
 import { fileSystemManager } from '../utils/fileSystemManager.js'
 import productsSource from '../data/products.json'
+import reviewsSource from '../data/reviews.json'
 
 const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'admin'
 const GH_OWNER = import.meta.env.VITE_GITHUB_OWNER || ''
 const GH_REPO = import.meta.env.VITE_GITHUB_REPO || ''
 const GH_TOKEN_PRESET = import.meta.env.VITE_GITHUB_TOKEN || ''
+const SESSION_KEY = 'cms_auth'
 
 export default {
   name: 'AdminPage',
 
   data() {
-    // Deep-clone source so we don't mutate the static import
     const products = JSON.parse(JSON.stringify(productsSource))
-
-    // Enrich each product with current images from the filesystem
     for (const [category, list] of Object.entries(products)) {
       for (const product of list) {
         product._category = category
@@ -189,14 +244,13 @@ export default {
       }
     }
 
-    // If a token is preset via env var, create the API instance immediately
     const api = GH_TOKEN_PRESET
       ? new GitHubApi(GH_TOKEN_PRESET, GH_OWNER, GH_REPO)
       : null
 
     return {
-      // Auth
-      authenticated: false,
+      // Auth — restore from sessionStorage so page reloads don't require re-login
+      authenticated: sessionStorage.getItem(SESSION_KEY) === '1',
       pinInput: '',
       pinError: false,
 
@@ -210,7 +264,11 @@ export default {
       // Products (mutable copy)
       products,
 
+      // Reviews (mutable copy)
+      reviews: JSON.parse(JSON.stringify(reviewsSource)),
+
       // UI state
+      activeTab: 'polo',   // category key or 'reviews'
       categories: [
         { key: 'polo', label: 'Поло' },
         { key: 'uniform', label: 'Форма' },
@@ -218,7 +276,6 @@ export default {
         { key: 'jackets', label: 'Куртки' },
         { key: 'shoppers', label: 'Промо' }
       ],
-      activeCategory: 'polo',
       openProducts: new Set(),
 
       // Drag & drop
@@ -232,8 +289,11 @@ export default {
   },
 
   computed: {
+    isReviewsTab() {
+      return this.activeTab === 'reviews'
+    },
     currentProducts() {
-      return this.products[this.activeCategory] || []
+      return this.products[this.activeTab] || []
     }
   },
 
@@ -244,10 +304,16 @@ export default {
       if (this.pinInput === ADMIN_PIN) {
         this.authenticated = true
         this.pinError = false
+        sessionStorage.setItem(SESSION_KEY, '1')
       } else {
         this.pinError = true
         this.pinInput = ''
       }
+    },
+
+    logout() {
+      this.authenticated = false
+      sessionStorage.removeItem(SESSION_KEY)
     },
 
     // ---- GitHub ----
@@ -312,6 +378,25 @@ export default {
       this.openProducts = next
     },
 
+    // ---- Reviews ----
+
+    addReview() {
+      const maxId = this.reviews.reduce((m, r) => Math.max(m, r.id), 0)
+      this.reviews.push({
+        id: maxId + 1,
+        author: '',
+        company: '',
+        text: '',
+        date: new Date().toISOString().slice(0, 10),
+        rating: 5
+      })
+    },
+
+    deleteReview(index) {
+      if (!confirm('Удалить отзыв?')) return
+      this.reviews.splice(index, 1)
+    },
+
     // ---- Drag & drop ----
 
     onDragStart(event, filename) {
@@ -332,7 +417,7 @@ export default {
       product._photos = reordered
     },
 
-    onDrop(event, product) {
+    onDrop() {
       this.draggingId = null
     },
 
@@ -351,8 +436,6 @@ export default {
           uploadEntry.status = 'конвертация...'
           const base64 = await fileToBase64(file)
           const objectUrl = URL.createObjectURL(file)
-
-          // Add to preview immediately
           product._photos.push({ filename: file.name, url: objectUrl, isNew: true, base64, file })
           uploadEntry.status = 'готово к сохранению'
         } catch (e) {
@@ -361,10 +444,10 @@ export default {
       }
     },
 
-    // ---- Delete ----
+    // ---- Delete photo ----
 
     deletePhoto(product, photo) {
-      if (!confirm(`Удалить фото "${photo.filename}"? Это действие применится после нажатия "Сохранить".`)) return
+      if (!confirm(`Удалить фото "${photo.filename}"? Применится после нажатия "Сохранить".`)) return
       product._photos = product._photos.filter(p => p.filename !== photo.filename)
       if (!product._deletedPhotos) product._deletedPhotos = []
       if (!photo.isNew) product._deletedPhotos.push(photo.filename)
@@ -405,10 +488,10 @@ export default {
           }
         }
 
-        // 3. Build updated products.json
-        const updated = {}
+        // 3. Build and push products.json
+        const updatedProducts = {}
         for (const [category, list] of Object.entries(this.products)) {
-          updated[category] = list.map(product => ({
+          updatedProducts[category] = list.map(product => ({
             id: product.id,
             slug: product.slug,
             name: product.name,
@@ -417,9 +500,18 @@ export default {
             imageOrder: (product._photos || []).map(p => p.filename)
           }))
         }
+        await this.api.updateProductsJson(updatedProducts)
 
-        // 4. Push products.json
-        await this.api.updateProductsJson(updated)
+        // 4. Push reviews.json
+        const updatedReviews = this.reviews.map(r => ({
+          id: r.id,
+          author: r.author,
+          company: r.company,
+          text: r.text,
+          date: r.date,
+          rating: r.rating
+        }))
+        await this.api.updateReviewsJson(updatedReviews)
 
         this.pendingUploads = []
         this.saveStatus = { type: 'success', message: 'Сохранено! Деплой запущен, изменения появятся через ~2 минуты.' }
@@ -930,5 +1022,108 @@ export default {
 
 .btn-logout:hover {
   background: rgba(255,255,255,0.25);
+}
+
+/* ---- Reviews editor ---- */
+.reviews-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-editor {
+  padding: 0;
+  overflow: hidden;
+}
+
+.review-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.review-num {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.btn-delete-review {
+  background: none;
+  border: 1px solid #e53935;
+  color: #e53935;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete-review:hover {
+  background: #ffebee;
+}
+
+.review-fields {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.star-picker {
+  display: flex;
+  gap: 4px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: #ddd;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s, transform 0.1s;
+}
+
+.star-btn:hover,
+.star-btn.filled {
+  color: #f5a623;
+}
+
+.star-btn:hover {
+  transform: scale(1.2);
+}
+
+.btn-add-review {
+  align-self: flex-start;
+  background: none;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.btn-add-review:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: rgba(114, 47, 55, 0.03);
+}
+
+.tab--reviews {
+  margin-left: auto;
 }
 </style>
