@@ -23,8 +23,9 @@ export class GitHubApi {
   }
 
   async getFileSha(path) {
-    const res = await fetch(`${this.base}/${path}?ref=${this.branch}`, {
-      headers: this._headers()
+    const bust = Date.now()
+    const res = await fetch(`${this.base}/${path}?ref=${this.branch}&_=${bust}`, {
+      headers: { ...this._headers(), 'Cache-Control': 'no-cache' }
     })
     if (res.status === 404) return null
     if (!res.ok) throw new Error(`GitHub API error ${res.status}: ${await res.text()}`)
@@ -66,6 +67,8 @@ export class GitHubApi {
   async updateProductsJson(productsObject) {
     const json = JSON.stringify(productsObject, null, 2)
     const base64 = btoa(unescape(encodeURIComponent(json)))
+    // Small delay to let GitHub settle after any preceding file operations
+    await new Promise(r => setTimeout(r, 500))
     return this.uploadFile(PRODUCTS_JSON_PATH, base64, 'CMS: update products.json')
   }
 
