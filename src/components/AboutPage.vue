@@ -4,76 +4,36 @@
 
       <section class="about-hero">
         <div class="about-hero-content">
-          <h1>Фабрика по пошиву одежды и производству трикотажных изделий</h1>
-          <h2>Надёжное швейное производство для брендов и бизнеса</h2>
-          <p class="about-lead">
-            Мы — современная фабрика по пошиву одежды, специализирующаяся на производстве
-            трикотажных изделий, промо-одежды и корпоративного текстиля. Работаем в том числе с малыми
-            и средними партиями, обеспечивая стабильное качество, контроль на всех этапах
-            и соблюдение сроков.
-          </p>
+          <h1>{{ about.heroTitle }}</h1>
+          <h2>{{ about.heroSubtitle }}</h2>
+          <p class="about-lead">{{ about.heroLead }}</p>
           <button class="btn" @click="openFeedback">Связаться с нами</button>
         </div>
       </section>
 
       <section class="about-section">
-        <h3>Производство трикотажных изделий полного цикла</h3>
-        <p>
-          Наша фабрика выполняет производство трикотажа от запуска образца до отгрузки
-          готовой продукции. Футболки, поло, свитшоты, брюки, спортивные костюмы, куртки,
-          жилеты, плащи, сумки и другое — мы закрываем весь ассортимент базовой и промо-одежды.
-        </p>
+        <h3>{{ about.productionTitle }}</h3>
+        <p>{{ about.productionText }}</p>
       </section>
 
       <section class="about-advantages">
-        <h4>Почему выбирают наше швейное производство</h4>
+        <h4>{{ about.advantagesTitle }}</h4>
         <ul class="advantages-list">
-          <li>
-            <span class="adv-icon">🏭</span>
-            <span>Фабрика по пошиву одежды с современным оборудованием</span>
-          </li>
-          <li>
-            <span class="adv-icon">✅</span>
-            <span>Производство трикотажных изделий с контролем качества</span>
-          </li>
-          <li>
-            <span class="adv-icon">🔍</span>
-            <span>Отдельный специалист по проверке готовой продукции</span>
-          </li>
-          <li>
-            <span class="adv-icon">🧵</span>
-            <span>Работа с собственным и давальческим сырьём</span>
-          </li>
-          <li>
-            <span class="adv-icon">🖨️</span>
-            <span>Вышивка, печать, шевроны, сублимация</span>
-          </li>
-          <li>
-            <span class="adv-icon">📅</span>
-            <span>Соблюдение сроков производства</span>
-          </li>
-          <li>
-            <span class="adv-icon">🚚</span>
-            <span>Работа со всеми транспортными компаниями</span>
+          <li v-for="(adv, i) in about.advantages" :key="i">
+            <span class="adv-icon">{{ ['🏭','✅','🔍','🧵','🖨️','📅','🚚'][i] || '✓' }}</span>
+            <span>{{ adv }}</span>
           </li>
         </ul>
       </section>
 
       <section class="about-section about-quality">
-        <h5>Контроль качества на каждом этапе производства</h5>
-        <p>
-          Каждое изделие проходит поэтапную проверку: от кроя и пошива до финального
-          осмотра перед отгрузкой. Это позволяет гарантировать стабильное качество партии
-          и соответствие утверждённым стандартам.
-        </p>
+        <h5>{{ about.qualityTitle }}</h5>
+        <p>{{ about.qualityText }}</p>
       </section>
 
       <section class="about-section about-partnership">
-        <h6>Фабрика одежды, ориентированная на долгосрочное сотрудничество</h6>
-        <p>
-          Мы выстраиваем партнёрские отношения с брендами, компаниями и агентствами,
-          предлагая гибкое производство и прозрачные условия работы.
-        </p>
+        <h6>{{ about.partnershipTitle }}</h6>
+        <p>{{ about.partnershipText }}</p>
         <button class="btn btn-outline" @click="openFeedback">Оставить заявку</button>
       </section>
 
@@ -83,12 +43,18 @@
 
 <script>
 import { inject } from 'vue'
+import contentData from '../data/content.json'
 
 export default {
   name: 'AboutPage',
   setup() {
     const openFeedbackModal = inject('openFeedbackModal')
     return { openFeedbackModal }
+  },
+  data() {
+    return {
+      about: contentData.about
+    }
   },
   methods: {
     openFeedback() {

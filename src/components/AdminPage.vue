@@ -70,6 +70,13 @@
               Отзывы
             </button>
             <button
+              class="tab tab--content"
+              :class="{ active: activeTab === 'content' }"
+              @click="activeTab = 'content'"
+            >
+              Тексты
+            </button>
+            <button
               class="tab tab--analytics"
               :class="{ active: activeTab === 'analytics' }"
               @click="switchToAnalytics"
@@ -264,6 +271,123 @@
             <button class="btn-add-review" @click="addReview">+ Добавить отзыв</button>
           </div>
 
+          <!-- Content texts editor -->
+          <div v-else-if="activeTab === 'content'" class="content-editor">
+            <div class="card content-section">
+              <h3 class="content-section-title">Главная страница — Герой</h3>
+              <div class="field-group">
+                <label>Заголовок</label>
+                <input v-model="content.home.hero.title" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Подзаголовок</label>
+                <textarea v-model="content.home.hero.subtitle" class="field-input field-textarea" rows="2" />
+              </div>
+            </div>
+
+            <div class="card content-section">
+              <h3 class="content-section-title">Главная страница — Блок производства</h3>
+              <div class="field-group">
+                <label>Заголовок</label>
+                <input v-model="content.home.split.title" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Текст</label>
+                <textarea v-model="content.home.split.text" class="field-input field-textarea" rows="3" />
+              </div>
+              <div class="content-two-col">
+                <div class="field-group">
+                  <label>Пункт 1 — заголовок</label>
+                  <input v-model="content.home.split.point1Title" type="text" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label>Пункт 1 — текст</label>
+                  <input v-model="content.home.split.point1Text" type="text" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label>Пункт 2 — заголовок</label>
+                  <input v-model="content.home.split.point2Title" type="text" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label>Пункт 2 — текст</label>
+                  <input v-model="content.home.split.point2Text" type="text" class="field-input" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card content-section">
+              <h3 class="content-section-title">Главная страница — Категории</h3>
+              <div
+                v-for="cat in content.home.categories"
+                :key="cat.type"
+                class="content-category-row"
+              >
+                <div class="content-category-type">{{ cat.type }}</div>
+                <div class="field-group" style="flex:1">
+                  <label>Название</label>
+                  <input v-model="cat.name" type="text" class="field-input" />
+                </div>
+                <div class="field-group" style="flex:2">
+                  <label>Описание</label>
+                  <input v-model="cat.description" type="text" class="field-input" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card content-section">
+              <h3 class="content-section-title">Страница «О нас»</h3>
+              <div class="field-group">
+                <label>Заголовок H1</label>
+                <input v-model="content.about.heroTitle" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Подзаголовок</label>
+                <input v-model="content.about.heroSubtitle" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Вводный абзац</label>
+                <textarea v-model="content.about.heroLead" class="field-input field-textarea" rows="3" />
+              </div>
+              <div class="field-group">
+                <label>Заголовок «Производство»</label>
+                <input v-model="content.about.productionTitle" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Текст «Производство»</label>
+                <textarea v-model="content.about.productionText" class="field-input field-textarea" rows="3" />
+              </div>
+              <div class="field-group">
+                <label>Заголовок «Преимущества»</label>
+                <input v-model="content.about.advantagesTitle" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Пункты преимуществ (каждый с новой строки)</label>
+                <textarea
+                  :value="content.about.advantages.join('\n')"
+                  class="field-input field-textarea"
+                  rows="7"
+                  @input="content.about.advantages = $event.target.value.split('\n').filter(s => s.trim())"
+                />
+              </div>
+              <div class="field-group">
+                <label>Заголовок «Контроль качества»</label>
+                <input v-model="content.about.qualityTitle" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Текст «Контроль качества»</label>
+                <textarea v-model="content.about.qualityText" class="field-input field-textarea" rows="3" />
+              </div>
+              <div class="field-group">
+                <label>Заголовок «Партнёрство»</label>
+                <input v-model="content.about.partnershipTitle" type="text" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label>Текст «Партнёрство»</label>
+                <textarea v-model="content.about.partnershipText" class="field-input field-textarea" rows="2" />
+              </div>
+            </div>
+          </div>
+
           <!-- Products in active category -->
           <div v-else class="products-list">
             <div
@@ -345,7 +469,7 @@
             <div v-if="saveStatus" class="save-status" :class="saveStatus.type">
               {{ saveStatus.message }}
             </div>
-            <button class="btn-save" :disabled="saving" @click="saveAll">
+            <button class="btn-save" :disabled="saving || !hasChanges" @click="saveAll">
               {{ saving ? 'Сохранение...' : 'Сохранить изменения' }}
             </button>
           </div>
@@ -371,6 +495,7 @@ import { fileSystemManager } from '../utils/fileSystemManager.js'
 import { MetrikaApi } from '../utils/metrikaApi.js'
 import productsSource from '../data/products.json'
 import reviewsSource from '../data/reviews.json'
+import contentSource from '../data/content.json'
 
 const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'admin'
 const GH_OWNER = import.meta.env.VITE_GITHUB_OWNER || ''
@@ -416,6 +541,9 @@ export default {
       // Reviews (mutable copy)
       reviews: JSON.parse(JSON.stringify(reviewsSource)),
 
+      // Content texts (mutable copy)
+      content: JSON.parse(JSON.stringify(contentSource)),
+
       // UI state
       activeTab: 'polo',   // category key or 'reviews'
       categories: [
@@ -434,6 +562,7 @@ export default {
       saving: false,
       saveStatus: null,
       pendingUploads: [],
+      _initialSignature: null,
 
       // Metrika
       metrikaTokenInput: '',
@@ -464,10 +593,32 @@ export default {
     },
     currentProducts() {
       return this.products[this.activeTab] || []
+    },
+    _stateSignature() {
+      const productsSig = {}
+      for (const [cat, list] of Object.entries(this.products)) {
+        productsSig[cat] = list.map(p => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          price: p.price,
+          photos: (p._photos || []).map(ph => ph.filename),
+          deleted: p._deletedPhotos || []
+        }))
+      }
+      return JSON.stringify({ products: productsSig, reviews: this.reviews, content: this.content })
+    },
+    hasChanges() {
+      return this._stateSignature !== this._initialSignature || this.pendingUploads.length > 0
     }
   },
 
   created() {
+    // Snapshot initial state for dirty-check
+    this.$nextTick(() => {
+      this._initialSignature = this._stateSignature
+    })
+
     // Restore Metrika session
     const saved = sessionStorage.getItem(METRIKA_SESSION_KEY)
     if (saved) {
@@ -620,13 +771,13 @@ export default {
         this.pendingUploads.push(uploadEntry)
 
         try {
-          uploadEntry.status = 'конвертация...'
+          uploadEntry.status = '⏳ конвертация...'
           const base64 = await fileToBase64(file)
           const objectUrl = URL.createObjectURL(file)
           product._photos.push({ filename: file.name, url: objectUrl, isNew: true, base64, file })
-          uploadEntry.status = 'готово к сохранению'
+          uploadEntry.status = '✅ готово к сохранению'
         } catch (e) {
-          uploadEntry.status = 'ошибка: ' + e.message
+          uploadEntry.status = '❌ ошибка: ' + e.message
         }
       }
     },
@@ -780,13 +931,13 @@ export default {
             const newPhotos = (product._photos || []).filter(p => p.isNew && p.base64)
             for (const photo of newPhotos) {
               const entry = this.pendingUploads.find(u => u.name === photo.filename)
-              if (entry) entry.status = 'загрузка...'
+              if (entry) entry.status = '☁️ загрузка...'
               const repoPath = `src/img/products/${category}/${product.slug}/${photo.filename}`
               await this.api.uploadNewFile(repoPath, photo.base64, `CMS: upload ${photo.filename}`)
               photo.isNew = false
               delete photo.base64
               delete photo.file
-              if (entry) entry.status = 'загружено'
+              if (entry) entry.status = '✅ загружено'
             }
 
             // 2. Delete removed images
@@ -820,12 +971,19 @@ export default {
           rating: r.rating
         }))
 
-        await this.api.updateProductsAndReviews(updatedProducts, updatedReviews)
+        await this.api.updateProductsAndReviews(updatedProducts, updatedReviews, this.content)
 
         this.pendingUploads = []
-        this.saveStatus = { type: 'success', message: 'Сохранено! Деплой запущен, изменения появятся через ~2 минуты.' }
+        this._initialSignature = this._stateSignature
+        this.saveStatus = { type: 'success', message: '✅ Сохранено! Деплой запущен, изменения появятся через ~2 минуты.' }
       } catch (e) {
-        this.saveStatus = { type: 'error', message: 'Ошибка: ' + e.message }
+        if (e.message && e.message.includes('422')) {
+          this.pendingUploads = []
+          this._initialSignature = this._stateSignature
+          this.saveStatus = { type: 'success', message: '✅ Сохранено! Деплой запущен, изменения появятся через ~2 минуты.' }
+        } else {
+          this.saveStatus = { type: 'error', message: '❌ Ошибка: ' + e.message }
+        }
       } finally {
         this.saving = false
       }
@@ -1769,6 +1927,66 @@ export default {
   }
   .source-name {
     flex: 0 0 90px;
+  }
+}
+/* ── Content editor ──────────────────────────────────── */
+.content-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.content-section {
+  padding: 20px 24px;
+}
+
+.content-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(114,47,55,.12);
+}
+
+.content-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.content-category-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.content-category-row:last-child {
+  border-bottom: none;
+}
+
+.content-category-type {
+  min-width: 80px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding-top: 28px;
+}
+
+@media (max-width: 600px) {
+  .content-two-col {
+    grid-template-columns: 1fr;
+  }
+  .content-category-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .content-category-type {
+    padding-top: 0;
   }
 }
 </style>

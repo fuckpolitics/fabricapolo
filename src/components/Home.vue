@@ -3,11 +3,8 @@
     <div class="container-wide">
       <section class="hero">
         <div class="hero-content">
-          <h2>Корпоративная одежда под Ваш бренд</h2>
-          <p>
-            Производим поло, форму, худи, футболки и аксессуары.
-            Подберём ткань, сделаем нанесение и лекала под задачи компании.
-          </p>
+          <h2>{{ hero.title }}</h2>
+          <p>{{ hero.subtitle }}</p>
           <button class="btn" @click="goToAbout">О нас</button>
         </div>
       </section>
@@ -32,20 +29,16 @@
           <ImageSlideshow :images="showcaseImages" alt="Производство" />
         </div>
         <div class="split-right">
-          <h3>Стабильное производство и контроль качества</h3>
-          <p>
-            Работаем с корпоративными заказами: подбираем материалы, строим лекала,
-            делаем нанесение (вышивка/шелкография/термотрансфер) и сопровождаем проект
-            от образца до партии.
-          </p>
+          <h3>{{ split.title }}</h3>
+          <p>{{ split.text }}</p>
           <div class="split-points">
             <div class="point">
-              <div class="point-title">Сроки и повторяемость</div>
-              <div class="point-text">Фиксируем параметры изделия и качество партии.</div>
+              <div class="point-title">{{ split.point1Title }}</div>
+              <div class="point-text">{{ split.point1Text }}</div>
             </div>
             <div class="point">
-              <div class="point-title">Нанесение под бренд</div>
-              <div class="point-text">Подберём оптимальную технологию под задачу.</div>
+              <div class="point-title">{{ split.point2Title }}</div>
+              <div class="point-text">{{ split.point2Text }}</div>
             </div>
           </div>
         </div>
@@ -61,6 +54,7 @@
 <script>
 import ImageSlideshow from './ImageSlideshow.vue'
 import LogoCarousel from './LogoCarousel.vue'
+import contentData from '../data/content.json'
 
 import logoGazprom from '../img/logos/gazprom.png'
 import logoDns from '../img/logos/dns.png'
@@ -79,39 +73,11 @@ export default {
     LogoCarousel
   },
   data() {
+    const home = contentData.home
     return {
-      categories: [
-        {
-          id: 1,
-          name: 'Футболки поло',
-          type: 'polo',
-          description: 'Производим поло всех моделей — от классики до индивидуальных решений'
-        },
-        {
-          id: 2,
-          name: 'Форменная одежда',
-          type: 'uniform',
-          description: 'Профессиональная форма для сотрудников любой компании'
-        },
-        {
-          id: 3,
-          name: 'Трикотаж',
-          type: 'hoodies',
-          description: 'Свитшоты и худи / Толстовки и бомберы / Лонгсливы / Брюки'
-        },
-        {
-          id: 4,
-          name: 'Жилетки/куртки/ветровки',
-          type: 'jackets',
-          description: 'Жилеты / Ветровки / Куртки / Бейсболки — брендирование и подбор материалов'
-        },
-        {
-          id: 5,
-          name: 'Промо текстиль',
-          type: 'shoppers',
-          description: 'Практичные сумки, шопперы, рюкзаки с брендированием'
-        }
-      ],
+      hero: home.hero,
+      split: home.split,
+      categories: home.categories.map((c, i) => ({ ...c, id: i + 1 })),
       showcaseImages: [
         'https://picsum.photos/seed/fp-showcase-1/1200/900',
         'https://picsum.photos/seed/fp-showcase-2/1200/900',

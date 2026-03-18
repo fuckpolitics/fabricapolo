@@ -3,6 +3,7 @@
 
 const PRODUCTS_JSON_PATH = 'src/data/products.json'
 const REVIEWS_JSON_PATH = 'src/data/reviews.json'
+const CONTENT_JSON_PATH = 'src/data/content.json'
 
 export class GitHubApi {
   constructor(token, owner, repo, branch = 'main') {
@@ -158,17 +159,15 @@ export class GitHubApi {
     }
   }
 
-  async updateProductsAndReviews(productsObject, reviewsArray) {
-    return this.commitMultipleFiles([
-      {
-        path: PRODUCTS_JSON_PATH,
-        content: JSON.stringify(productsObject, null, 2)
-      },
-      {
-        path: REVIEWS_JSON_PATH,
-        content: JSON.stringify(reviewsArray, null, 2)
-      }
-    ], 'CMS: update products & reviews')
+  async updateProductsAndReviews(productsObject, reviewsArray, contentObject) {
+    const files = [
+      { path: PRODUCTS_JSON_PATH, content: JSON.stringify(productsObject, null, 2) },
+      { path: REVIEWS_JSON_PATH, content: JSON.stringify(reviewsArray, null, 2) }
+    ]
+    if (contentObject) {
+      files.push({ path: CONTENT_JSON_PATH, content: JSON.stringify(contentObject, null, 2) })
+    }
+    return this.commitMultipleFiles(files, 'CMS: update content')
   }
 
   // Validate the token by fetching repo info
