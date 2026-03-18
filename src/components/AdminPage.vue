@@ -340,8 +340,8 @@
           </div>
           <!-- /v-else products list -->
 
-          <!-- Save button -->
-          <div class="save-bar">
+          <!-- Save button — hidden on analytics tab -->
+          <div v-if="activeTab !== 'analytics'" class="save-bar">
             <div v-if="saveStatus" class="save-status" :class="saveStatus.type">
               {{ saveStatus.message }}
             </div>
@@ -782,7 +782,7 @@ export default {
               const entry = this.pendingUploads.find(u => u.name === photo.filename)
               if (entry) entry.status = 'загрузка...'
               const repoPath = `src/img/products/${category}/${product.slug}/${photo.filename}`
-              await this.api.uploadFile(repoPath, photo.base64, `CMS: upload ${photo.filename}`)
+              await this.api.uploadNewFile(repoPath, photo.base64, `CMS: upload ${photo.filename}`)
               photo.isNew = false
               delete photo.base64
               delete photo.file
@@ -798,7 +798,7 @@ export default {
           }
         }
 
-        // 3. Build and push products.json
+        // 3. Build and push products.json + reviews.json in one commit
         const updatedProducts = {}
         for (const [category, list] of Object.entries(this.products)) {
           updatedProducts[category] = list.map(product => ({
@@ -810,9 +810,7 @@ export default {
             imageOrder: (product._photos || []).map(p => p.filename)
           }))
         }
-        await this.api.updateProductsJson(updatedProducts)
 
-        // 4. Push reviews.json
         const updatedReviews = this.reviews.map(r => ({
           id: r.id,
           author: r.author,
@@ -821,7 +819,8 @@ export default {
           date: r.date,
           rating: r.rating
         }))
-        await this.api.updateReviewsJson(updatedReviews)
+
+        await this.api.updateProductsAndReviews(updatedProducts, updatedReviews)
 
         this.pendingUploads = []
         this.saveStatus = { type: 'success', message: 'Сохранено! Деплой запущен, изменения появятся через ~2 минуты.' }
@@ -1221,7 +1220,7 @@ export default {
   padding: 16px 0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 16px;
 }
 
