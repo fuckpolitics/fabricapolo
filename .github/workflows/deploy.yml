@@ -43,6 +43,8 @@ jobs:
           VITE_GITHUB_OWNER: ${{ secrets.VITE_GITHUB_OWNER }}
           VITE_GITHUB_REPO: ${{ secrets.VITE_GITHUB_REPO }}
           VITE_GITHUB_TOKEN: ${{ secrets.VITE_GITHUB_TOKEN }}
+          VITE_METRIKA_TOKEN: ${{ secrets.VITE_METRIKA_TOKEN }}
+          VITE_METRIKA_ID: ${{ secrets.VITE_METRIKA_ID }}
         run: npm run build
 
       - name: Fix SPA routing for GitHub Pages

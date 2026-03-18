@@ -69,6 +69,151 @@
             >
               Отзывы
             </button>
+            <button
+              class="tab tab--analytics"
+              :class="{ active: activeTab === 'analytics' }"
+              @click="switchToAnalytics"
+            >
+              Аналитика
+            </button>
+          </div>
+
+          <!-- Analytics tab -->
+          <div v-if="activeTab === 'analytics'" class="analytics-section">
+
+            <!-- Not configured -->
+            <div v-if="!metrikaReady" class="card analytics-setup">
+              <h2>Подключение Яндекс Метрики</h2>
+              <p class="hint">Нужен OAuth-токен и ID счётчика Метрики. Инструкция по получению — в документации проекта.</p>
+              <div class="field-group">
+                <label>OAuth-токен</label>
+                <input v-model="metrikaTokenInput" type="password" class="field-input" placeholder="y0_AgAAAA..." />
+              </div>
+              <div class="field-group">
+                <label>ID счётчика</label>
+                <input v-model="metrikaCounterInput" type="text" class="field-input field-input--short" placeholder="12345678" />
+              </div>
+              <p v-if="metrikaError" class="auth-error">{{ metrikaError }}</p>
+              <button class="btn-primary" :disabled="metrikaConnecting" @click="connectMetrika">
+                {{ metrikaConnecting ? 'Проверка...' : 'Подключить' }}
+              </button>
+            </div>
+
+            <!-- Configured — show stats -->
+            <template v-else>
+              <!-- Period selector -->
+              <div class="analytics-toolbar">
+                <div class="period-tabs">
+                  <button
+                    v-for="p in periods"
+                    :key="p.value"
+                    class="period-tab"
+                    :class="{ active: analyticsPeriod === p.value }"
+                    @click="setAnalyticsPeriod(p.value)"
+                  >{{ p.label }}</button>
+                </div>
+                <button class="btn-refresh" :disabled="analyticsLoading" @click="loadAnalytics">
+                  {{ analyticsLoading ? '...' : '↻ Обновить' }}
+                </button>
+              </div>
+
+              <p v-if="analyticsError" class="auth-error card" style="padding:14px">{{ analyticsError }}</p>
+
+              <!-- Summary cards -->
+              <div v-if="analyticsSummary" class="stat-cards">
+                <div class="stat-card">
+                  <div class="stat-value">{{ fmt(analyticsSummary.visits) }}</div>
+                  <div class="stat-label">Визиты</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">{{ fmt(analyticsSummary.users) }}</div>
+                  <div class="stat-label">Посетители</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">{{ analyticsSummary.bounceRate }}%</div>
+                  <div class="stat-label">Отказы</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value">{{ analyticsSummary.avgDuration }}</div>
+                  <div class="stat-label">Ср. время</div>
+                </div>
+              </div>
+
+              <div class="analytics-grid">
+                <!-- Visits chart -->
+                <div class="card analytics-card analytics-card--wide">
+                  <h4 class="analytics-card-title">Визиты по дням</h4>
+                  <div v-if="analyticsLoading" class="analytics-loading">Загрузка...</div>
+                  <div v-else-if="visitsByDay.length" class="bar-chart">
+                    <div
+                      v-for="day in visitsByDay"
+                      :key="day.date"
+                      class="bar-col"
+                    >
+                      <div class="bar-wrap">
+                        <div
+                          class="bar"
+                          :style="{ height: day.heightPct + '%' }"
+                          :title="day.date + ': ' + day.visits + ' визитов'"
+                        ></div>
+                      </div>
+                      <div class="bar-label">{{ day.shortDate }}</div>
+                    </div>
+                  </div>
+                  <p v-else class="no-data">Нет данных</p>
+                </div>
+
+                <!-- Traffic sources -->
+                <div class="card analytics-card">
+                  <h4 class="analytics-card-title">Источники трафика</h4>
+                  <div v-if="analyticsLoading" class="analytics-loading">Загрузка...</div>
+                  <div v-else-if="trafficSources.length" class="donut-section">
+                    <div class="source-list">
+                      <div v-for="src in trafficSources" :key="src.name" class="source-row">
+                        <div class="source-dot" :style="{ background: src.color }"></div>
+                        <span class="source-name">{{ src.name }}</span>
+                        <span class="source-bar-wrap">
+                          <span class="source-bar" :style="{ width: src.pct + '%', background: src.color }"></span>
+                        </span>
+                        <span class="source-val">{{ src.pct }}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p v-else class="no-data">Нет данных</p>
+                </div>
+
+                <!-- Devices -->
+                <div class="card analytics-card">
+                  <h4 class="analytics-card-title">Устройства</h4>
+                  <div v-if="analyticsLoading" class="analytics-loading">Загрузка...</div>
+                  <div v-else-if="devices.length" class="device-list">
+                    <div v-for="dev in devices" :key="dev.name" class="device-row">
+                      <span class="device-icon">{{ dev.icon }}</span>
+                      <span class="device-name">{{ dev.name }}</span>
+                      <div class="device-bar-wrap">
+                        <div class="device-bar" :style="{ width: dev.pct + '%' }"></div>
+                      </div>
+                      <span class="device-val">{{ dev.pct }}%</span>
+                    </div>
+                  </div>
+                  <p v-else class="no-data">Нет данных</p>
+                </div>
+
+                <!-- Top pages -->
+                <div class="card analytics-card analytics-card--wide">
+                  <h4 class="analytics-card-title">Популярные страницы</h4>
+                  <div v-if="analyticsLoading" class="analytics-loading">Загрузка...</div>
+                  <div v-else-if="topPages.length" class="pages-table">
+                    <div v-for="(page, i) in topPages" :key="page.url" class="page-row">
+                      <span class="page-rank">{{ i + 1 }}</span>
+                      <span class="page-url">{{ page.url }}</span>
+                      <span class="page-views">{{ fmt(page.views) }} просм.</span>
+                    </div>
+                  </div>
+                  <p v-else class="no-data">Нет данных</p>
+                </div>
+              </div>
+            </template>
           </div>
 
           <!-- Reviews editor -->
@@ -223,6 +368,7 @@
 <script>
 import { GitHubApi, fileToBase64 } from '../utils/githubApi.js'
 import { fileSystemManager } from '../utils/fileSystemManager.js'
+import { MetrikaApi } from '../utils/metrikaApi.js'
 import productsSource from '../data/products.json'
 import reviewsSource from '../data/reviews.json'
 
@@ -230,7 +376,10 @@ const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || 'admin'
 const GH_OWNER = import.meta.env.VITE_GITHUB_OWNER || ''
 const GH_REPO = import.meta.env.VITE_GITHUB_REPO || ''
 const GH_TOKEN_PRESET = import.meta.env.VITE_GITHUB_TOKEN || ''
+const METRIKA_TOKEN_PRESET = import.meta.env.VITE_METRIKA_TOKEN || ''
+const METRIKA_COUNTER_PRESET = import.meta.env.VITE_METRIKA_ID || ''
 const SESSION_KEY = 'cms_auth'
+const METRIKA_SESSION_KEY = 'cms_metrika'
 
 export default {
   name: 'AdminPage',
@@ -284,7 +433,28 @@ export default {
       // Save
       saving: false,
       saveStatus: null,
-      pendingUploads: []
+      pendingUploads: [],
+
+      // Metrika
+      metrikaTokenInput: '',
+      metrikaCounterInput: '',
+      metrikaError: '',
+      metrikaConnecting: false,
+      metrikaApi: null,
+      metrikaReady: false,
+      analyticsLoading: false,
+      analyticsError: '',
+      analyticsPeriod: 30,
+      periods: [
+        { value: 7, label: '7 дней' },
+        { value: 30, label: '30 дней' },
+        { value: 90, label: '90 дней' }
+      ],
+      analyticsSummary: null,
+      visitsByDay: [],
+      trafficSources: [],
+      devices: [],
+      topPages: []
     }
   },
 
@@ -294,6 +464,23 @@ export default {
     },
     currentProducts() {
       return this.products[this.activeTab] || []
+    }
+  },
+
+  created() {
+    // Restore Metrika session
+    const saved = sessionStorage.getItem(METRIKA_SESSION_KEY)
+    if (saved) {
+      try {
+        const { token, counter } = JSON.parse(saved)
+        this.metrikaApi = new MetrikaApi(token, counter)
+        this.metrikaReady = true
+      } catch {}
+    }
+    // If preset via env vars — use immediately
+    if (!this.metrikaReady && METRIKA_TOKEN_PRESET && METRIKA_COUNTER_PRESET) {
+      this.metrikaApi = new MetrikaApi(METRIKA_TOKEN_PRESET, METRIKA_COUNTER_PRESET)
+      this.metrikaReady = true
     }
   },
 
@@ -451,6 +638,129 @@ export default {
       product._photos = product._photos.filter(p => p.filename !== photo.filename)
       if (!product._deletedPhotos) product._deletedPhotos = []
       if (!photo.isNew) product._deletedPhotos.push(photo.filename)
+    },
+
+    // ---- Analytics ----
+
+    async connectMetrika() {
+      if (!this.metrikaTokenInput.trim() || !this.metrikaCounterInput.trim()) {
+        this.metrikaError = 'Заполните оба поля'
+        return
+      }
+      this.metrikaConnecting = true
+      this.metrikaError = ''
+      try {
+        const api = new MetrikaApi(this.metrikaTokenInput.trim(), this.metrikaCounterInput.trim())
+        const ok = await api.validate()
+        if (!ok) {
+          this.metrikaError = 'Токен или ID счётчика неверны'
+          return
+        }
+        this.metrikaApi = api
+        this.metrikaReady = true
+        sessionStorage.setItem(METRIKA_SESSION_KEY, JSON.stringify({
+          token: this.metrikaTokenInput.trim(),
+          counter: this.metrikaCounterInput.trim()
+        }))
+        this.loadAnalytics()
+      } catch (e) {
+        this.metrikaError = 'Ошибка: ' + e.message
+      } finally {
+        this.metrikaConnecting = false
+      }
+    },
+
+    switchToAnalytics() {
+      this.activeTab = 'analytics'
+      if (this.metrikaReady && !this.analyticsSummary) {
+        this.loadAnalytics()
+      }
+    },
+
+    setAnalyticsPeriod(days) {
+      this.analyticsPeriod = days
+      this.loadAnalytics()
+    },
+
+    async loadAnalytics() {
+      if (!this.metrikaApi) return
+      this.analyticsLoading = true
+      this.analyticsError = ''
+      try {
+        const days = this.analyticsPeriod
+        const [summary, byDay, sources, devs, pages] = await Promise.all([
+          this.metrikaApi.getSummary(days),
+          this.metrikaApi.getVisitsByDay(days),
+          this.metrikaApi.getTrafficSources(days),
+          this.metrikaApi.getDevices(days),
+          this.metrikaApi.getTopPages(days)
+        ])
+
+        // Summary
+        const totals = summary.totals || []
+        this.analyticsSummary = {
+          visits: Math.round(totals[0] || 0),
+          users: Math.round(totals[1] || 0),
+          bounceRate: Math.round((totals[2] || 0) * 10) / 10,
+          avgDuration: this._fmtSeconds(totals[4] || 0)
+        }
+
+        // Visits by day chart
+        const dayData = (byDay.data || []).map(row => ({
+          date: row.dimensions?.[0]?.name || '',
+          visits: Math.round(row.metrics?.[0] || 0)
+        }))
+        const maxV = Math.max(...dayData.map(d => d.visits), 1)
+        this.visitsByDay = dayData.map(d => ({
+          ...d,
+          shortDate: d.date.slice(5),
+          heightPct: Math.max(4, Math.round((d.visits / maxV) * 100))
+        }))
+
+        // Traffic sources
+        const srcTotal = (sources.data || []).reduce((s, r) => s + (r.metrics?.[0] || 0), 0) || 1
+        const srcColors = ['#722f37', '#e57373', '#ef9a9a', '#ffcdd2', '#b71c1c', '#d32f2f', '#f44336', '#e53935']
+        this.trafficSources = (sources.data || []).map((row, i) => ({
+          name: row.dimensions?.[0]?.name || '—',
+          visits: Math.round(row.metrics?.[0] || 0),
+          pct: Math.round(((row.metrics?.[0] || 0) / srcTotal) * 100),
+          color: srcColors[i % srcColors.length]
+        }))
+
+        // Devices
+        const devTotal = (devs.data || []).reduce((s, r) => s + (r.metrics?.[0] || 0), 0) || 1
+        const devIcons = { desktop: '🖥️', mobile: '📱', tablet: '📲' }
+        const devNames = { desktop: 'Десктоп', mobile: 'Мобильный', tablet: 'Планшет' }
+        this.devices = (devs.data || []).map(row => {
+          const key = (row.dimensions?.[0]?.name || '').toLowerCase()
+          return {
+            name: devNames[key] || row.dimensions?.[0]?.name || '—',
+            icon: devIcons[key] || '💻',
+            visits: Math.round(row.metrics?.[0] || 0),
+            pct: Math.round(((row.metrics?.[0] || 0) / devTotal) * 100)
+          }
+        })
+
+        // Top pages
+        this.topPages = (pages.data || []).map(row => ({
+          url: row.dimensions?.[0]?.name || '/',
+          views: Math.round(row.metrics?.[0] || 0)
+        }))
+      } catch (e) {
+        this.analyticsError = 'Ошибка загрузки: ' + e.message
+      } finally {
+        this.analyticsLoading = false
+      }
+    },
+
+    fmt(n) {
+      return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n)
+    },
+
+    _fmtSeconds(sec) {
+      const m = Math.floor(sec / 60)
+      const s = Math.round(sec % 60)
+      return m > 0 ? `${m}м ${s}с` : `${s}с`
     },
 
     // ---- Save ----
@@ -1125,5 +1435,341 @@ export default {
 
 .tab--reviews {
   margin-left: auto;
+}
+
+.tab--analytics {
+  background: linear-gradient(135deg, #722f37, #a0434e);
+  color: white;
+  border-color: transparent;
+}
+
+.tab--analytics.active,
+.tab--analytics:hover {
+  opacity: 0.85;
+  color: white;
+  border-color: transparent;
+}
+
+/* ---- Analytics ---- */
+.analytics-setup h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+}
+
+.analytics-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.period-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.period-tab {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.period-tab.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.btn-refresh {
+  background: none;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #555;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-refresh:disabled {
+  opacity: 0.5;
+}
+
+/* Summary stat cards */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px 16px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary-color);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Analytics grid */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.analytics-card {
+  padding: 20px;
+  margin-bottom: 0;
+}
+
+.analytics-card--wide {
+  grid-column: 1 / -1;
+}
+
+.analytics-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.analytics-loading {
+  color: #aaa;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.no-data {
+  color: #bbb;
+  font-size: 14px;
+  text-align: center;
+  padding: 16px 0;
+}
+
+/* Bar chart */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  background: var(--primary-color);
+  border-radius: 3px 3px 0 0;
+  min-height: 3px;
+  transition: height 0.3s;
+  opacity: 0.85;
+  cursor: default;
+}
+
+.bar:hover {
+  opacity: 1;
+}
+
+.bar-label {
+  font-size: 9px;
+  color: #aaa;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+/* Traffic sources */
+.source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.source-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.source-name {
+  flex: 0 0 130px;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.source-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.source-bar {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+
+.source-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  flex: 0 0 36px;
+  text-align: right;
+}
+
+/* Devices */
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.device-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.device-icon {
+  font-size: 20px;
+}
+
+.device-name {
+  flex: 0 0 100px;
+  color: #444;
+}
+
+.device-bar-wrap {
+  flex: 1;
+  height: 10px;
+  background: #f0f0f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.device-bar {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 5px;
+  transition: width 0.4s;
+  opacity: 0.8;
+}
+
+.device-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  flex: 0 0 36px;
+  text-align: right;
+}
+
+/* Top pages */
+.pages-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  padding: 8px 10px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.page-rank {
+  font-weight: 700;
+  color: var(--primary-color);
+  flex: 0 0 20px;
+  text-align: center;
+}
+
+.page-url {
+  flex: 1;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-views {
+  font-size: 13px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+  .analytics-card--wide {
+    grid-column: 1;
+  }
+  .source-name {
+    flex: 0 0 90px;
+  }
 }
 </style>
