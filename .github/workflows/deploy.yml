@@ -37,7 +37,6 @@ jobs:
 
       - name: Build
         env:
-          VITE_BASE_PATH: /fabricapolo/
           VITE_FORMSPREE_ID: ${{ secrets.FORMSPREE_ID }}
           VITE_ADMIN_PIN: ${{ secrets.VITE_ADMIN_PIN }}
           VITE_GITHUB_OWNER: ${{ secrets.VITE_GITHUB_OWNER }}
