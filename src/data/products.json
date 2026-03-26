@@ -29,7 +29,6 @@
         "IMG-20231207-WA0102.jpg",
         "DSC01963.jpg",
         "DSC01966.jpg",
-        "IMG_7221.jpg",
         "IMG_8694.JPG",
         "IMG_8697.JPG",
         "IMG_1136.JPG",
@@ -41,12 +40,12 @@
     {
       "id": 3,
       "slug": "polo-details",
-      "name": "Футболка поло детали",
+      "name": "Футболка поло Детали",
       "description": "Премиум качество для особых случаев",
       "price": 3200,
       "imageOrder": [
-        "1.jpg",
         "2.jpg",
+        "1.jpg",
         "3.jpg",
         "4.jpg",
         "5.jpg",
@@ -56,10 +55,7 @@
         "DSC_5666.jpg",
         "DSC_6092_web.jpg",
         "IMG_20260219_112610.jpg",
-        "IMG-20210304-WA0012.jpg",
         "IMG-20210317-WA0002.jpg",
-        "IMG-20210513-WA0001.jpg",
-        "IMG-20210520-WA0044.jpg",
         "IMG-20210520-WA0046.jpg",
         "IMG-20210520-WA0047.jpg",
         "IMG-20210611-WA0000.jpg",
@@ -136,12 +132,9 @@
         "DSC00713.jpg",
         "DSC00714.jpg",
         "IMG_8689 (1).JPG",
-        "IMG_8690.JPG",
-        "DSC_5364_web.jpg",
         "DSC_5894.jpg",
         "IMG_7219.jpg",
         "IMG_7220.jpg",
-        "IMG_8691.JPG",
         "IMG_8692.JPG"
       ]
     }
