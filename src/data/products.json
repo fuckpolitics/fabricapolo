@@ -5,7 +5,7 @@
       "slug": "female-polo",
       "name": "Футболка поло женская",
       "description": "Идеально подходит для корпоративного стиля",
-      "price": 1488,
+      "price": 0,
       "imageOrder": [
         "1.jpg",
         "DSC_6039_web.jpg",
@@ -23,7 +23,7 @@
       "slug": "male-polo",
       "name": "Футболка поло мужская",
       "description": "Дышащая ткань для активного образа жизни",
-      "price": 2800,
+      "price": 0,
       "imageOrder": [
         "IMG-20231207-WA0101.jpg",
         "IMG-20231207-WA0102.jpg",
@@ -42,7 +42,7 @@
       "slug": "polo-details",
       "name": "Футболка поло Детали",
       "description": "Премиум качество для особых случаев",
-      "price": 3200,
+      "price": 0,
       "imageOrder": [
         "2.jpg",
         "1.jpg",
@@ -69,7 +69,7 @@
       "slug": "basic-tshirt",
       "name": "Футболка",
       "description": "Удобный вариант для повседневной носки",
-      "price": 2000,
+      "price": 0,
       "imageOrder": [
         "22-10.09.21.JPG",
         "IMG_8695.JPG",
@@ -85,7 +85,7 @@
       "slug": "unarmy",
       "name": "Юнармия",
       "description": "Профессиональная форма для юнармии",
-      "price": 4500,
+      "price": 0,
       "imageOrder": [
         "1.jpg",
         "2.jpg",
@@ -116,7 +116,7 @@
       "slug": "unarmy-hoodies",
       "name": "Юнармия. Толстовки",
       "description": "Уютные толстовки для юнармии",
-      "price": 3800,
+      "price": 0,
       "imageOrder": [
         "image.png"
       ]
@@ -126,7 +126,7 @@
       "slug": "ems",
       "name": "МЧС",
       "description": "Профессиональная форма МЧС",
-      "price": 5500,
+      "price": 0,
       "imageOrder": [
         "1_IMG_4559.JPG",
         "DSC00713.jpg",
@@ -145,7 +145,7 @@
       "slug": "sweatshirts",
       "name": "Толстовки",
       "description": "Уютное тепло для холодных дней",
-      "price": 3500,
+      "price": 0,
       "imageOrder": [
         "толстовка оверсайз.jpg",
         "толстовка оверсайз.ю хаки.jpg",
@@ -157,7 +157,7 @@
       "slug": "hoodie",
       "name": "Худи",
       "description": "Для тренировок и активного отдыха",
-      "price": 3800,
+      "price": 0,
       "imageOrder": [
         "Худи оверсайз.jpg",
         "худи.jpeg",
@@ -174,7 +174,7 @@
       "slug": "sweaters",
       "name": "Свитшоты",
       "description": "Стильные свитшоты для повседневной носки",
-      "price": 3200,
+      "price": 0,
       "imageOrder": [
         "IMG-20220202-WA0005.jpg",
         "IMG-20220202-WA0012.jpg",
@@ -189,7 +189,7 @@
       "slug": "bomber",
       "name": "Бомберы",
       "description": "Современные бомберы для вашего стиля",
-      "price": 4500,
+      "price": 0,
       "imageOrder": []
     },
     {
@@ -197,7 +197,7 @@
       "slug": "pants",
       "name": "Брюки",
       "description": "Комфортные брюки для повседневной носки",
-      "price": 2800,
+      "price": 0,
       "imageOrder": [
         "IMG-20231207-WA0112.jpg",
         "IMG-20231207-WA0113.jpg",
@@ -211,7 +211,7 @@
       "slug": "promo-textile",
       "name": "Промо текстиль",
       "description": "Практичные промо-изделия с брендированием",
-      "price": 800,
+      "price": 0,
       "imageOrder": [
         "1658235164726.jpg",
         "1658235164746.jpg",
@@ -233,7 +233,7 @@
       "slug": "vests",
       "name": "Жилетки",
       "description": "Стильные и практичные жилетки",
-      "price": 4200,
+      "price": 0,
       "imageOrder": [
         "IMG_1318.jpg",
         "1.jpg",
@@ -256,7 +256,7 @@
       "slug": "coats",
       "name": "Куртки",
       "description": "Защита от ветра и легких осадков",
-      "price": 6500,
+      "price": 0,
       "imageOrder": [
         "DSC_6075.jpg",
         "DSC_6078_web.jpg"
@@ -267,7 +267,7 @@
       "slug": "windbreaker",
       "name": "Ветровки",
       "description": "Легкие ветровки для демисезонного периода",
-      "price": 3200,
+      "price": 0,
       "imageOrder": [
         "DSC_2384.jpg",
         "DSC_2416.jpg",
