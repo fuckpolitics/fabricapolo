@@ -5,7 +5,7 @@
       "slug": "female-polo",
       "name": "Футболка поло женская",
       "description": "Идеально подходит для корпоративного стиля",
-      "price": 0,
+      "price": 740,
       "imageOrder": [
         "1.jpg",
         "DSC_6039_web.jpg",
@@ -23,7 +23,7 @@
       "slug": "male-polo",
       "name": "Футболка поло мужская",
       "description": "Дышащая ткань для активного образа жизни",
-      "price": 0,
+      "price": 740,
       "imageOrder": [
         "IMG-20231207-WA0101.jpg",
         "IMG-20231207-WA0102.jpg",
@@ -41,7 +41,7 @@
       "id": 3,
       "slug": "polo-details",
       "name": "Футболка поло Детали",
-      "description": "Премиум качество для особых случаев",
+      "description": "Варианты обработки рукавов, пуговичной планки, разрезов и т.п",
       "price": 0,
       "imageOrder": [
         "2.jpg",
